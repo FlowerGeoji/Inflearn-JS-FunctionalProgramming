@@ -1,0 +1,22 @@
+{
+  "name": "fp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlowerGeoji/fp.git"
+  },
+  "author": "FlowerGeoji",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FlowerGeoji/fp/issues"
+  },
+  "homepage": "https://github.com/FlowerGeoji/fp#readme",
+  "devDependencies": {
+    "jest": "^26.0.1"
+  }
+}
