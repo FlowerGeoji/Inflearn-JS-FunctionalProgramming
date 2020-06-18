@@ -1,4 +1,4 @@
-import * as fp from '../index'
+import * as fp from '../src/es5/index'
 
 describe('Functional Programming', ()=>{
   /**
