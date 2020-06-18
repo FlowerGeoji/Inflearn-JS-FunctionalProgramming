@@ -30,11 +30,11 @@ describe('Functional Programming', ()=>{
   ]
 
   test('Test curry', ()=>{
-    const curried = fp._each(console.log)
-    expect(curried).toBeInstanceOf(Function)
-    expect(curried([1, 2, 3, 4])).toBeInstanceOf(Array)
+    // const curried = fp._each(console.log)
+    // expect(curried).toBeInstanceOf(Function)
+    // expect(curried([1, 2, 3, 4])).toBeInstanceOf(Array)
 
-    expect(fp._each([], console.log)).toBeInstanceOf(Array)
+    // expect(fp._each([], console.log)).toBeInstanceOf(Array)
   })
 
   const ARRAY = [1, 2, 3, 4]
