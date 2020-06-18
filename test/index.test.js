@@ -1,4 +1,4 @@
-import * as fp from './index'
+import * as fp from '../index'
 
 describe('Functional Programming', ()=>{
   /**
@@ -260,5 +260,9 @@ describe('Functional Programming', ()=>{
       test1,
     )
     expect(test2).toMatch('20대는 3명 입니다.')
+  })
+
+  test('지연 평가 테스트', ()=>{
+    
   })
 })
