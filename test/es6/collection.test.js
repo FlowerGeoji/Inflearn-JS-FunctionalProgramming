@@ -40,17 +40,10 @@ describe('', ()=>{
 
     // 다형성
     expect(
-      fp.reduce((prev, curr)=>{
-        prev+=curr.price
-        return prev
-      }, 0, DATA1)
-    ).toBe(100000)
-
-    expect(
-      fp.reduce((prev, curr)=>{
-        prev.price+=curr.price
-        return prev
-      }, DATA1)
+      fp.reduce((prev, curr)=>({
+        name: prev.name,
+        price: prev.price+curr.price
+      }), DATA1)
     ).toMatchObject({name: '반팔티', price: 100000})
 
     // 다형성
@@ -74,5 +67,93 @@ describe('', ()=>{
     expect(
       fp.map(item=>item.price, DATA2)
     ).toMatchObject([10000, 20000, 15000, 30000, 25000])
+  })
+
+  test('Evaluation test', ()=>{
+    expect(
+      fp.reduce(
+        (prev, curr)=>prev+curr,
+        fp.map(
+          item => item.price,
+          fp.filter(item => item.price < 20000, DATA1)
+        )
+      )
+    ).toBe(25000)
+
+    expect(
+      fp.reduce(
+        (prev, curr)=>prev+curr,
+        fp.filter(
+          item => item < 20000,
+          fp.map(item => item.price, DATA1)
+        )
+      )
+    ).toBe(25000)
+
+    expect(
+      fp.go(DATA1,
+        (datas) => fp.filter((item=>item.price < 20000), datas),
+        (datas) => fp.map((item=>item.price), datas),
+        (datas) => fp.reduce((prev, curr)=>prev+curr, datas)
+      )
+    ).toBe(25000)
+
+    expect(
+      fp.pipe(
+        (datas) => fp.filter((item=>item.price < 20000), datas),
+        (datas) => fp.map((item=>item.price), datas),
+        (datas) => fp.reduce((prev, curr)=>prev+curr, datas)
+      )(DATA1)
+    ).toBe(25000)
+
+    expect(
+      fp.pipe(
+        (arr, obj) => [...fp.map(item=>item.price, arr), ...fp.map(item=>item.price, obj)],
+        (datas) => fp.filter((item=>item < 20000), datas),
+        (datas) => fp.reduce((prev, curr)=>prev+curr, datas)
+      )(DATA1, DATA2)
+    ).toBe(50000)
+
+    // curry test
+    const mult = fp.curry((a, b)=> a*b)
+    expect(mult).toBeInstanceOf(Function)
+    expect(mult(1)).toBeInstanceOf(Function)
+    expect(mult(2,5)).toBe(10)
+    expect(mult(2)(5)).toBe(10)
+
+    expect(
+      fp.go(DATA1,
+        fp.filter((item=>item.price < 20000)),
+        fp.map((item=>item.price)),
+        fp.reduce((prev, curr)=>prev+curr)
+      )
+    ).toBe(25000)
+
+    expect(
+      fp.pipe(
+        fp.filter((item=>item.price < 20000)),
+        fp.map((item=>item.price)),
+        fp.reduce((prev, curr)=>prev+curr)
+      )(DATA1)
+    ).toBe(25000)
+
+    const totalPrice = fp.pipe(
+      fp.map((item=>item.price)),
+      fp.reduce((prev, curr)=>prev+curr)
+    )
+
+    expect(
+      fp.go(DATA1,
+        fp.filter((item=>item.price < 20000)),
+        totalPrice
+      )
+    ).toBe(25000)
+
+    expect(
+      fp.pipe(
+        fp.filter((item=>item.price < 20000)),
+        totalPrice
+      )(DATA1)
+    ).toBe(25000)
   })
 })

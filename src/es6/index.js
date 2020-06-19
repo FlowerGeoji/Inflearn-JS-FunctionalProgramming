@@ -33,6 +33,10 @@ const isIterable = iter => !!iter[Symbol.iterator]
 
 const keys = obj => isObject(obj) ? Object.keys(obj) : []
 
+const curry = (func) => (val, ...rest) => {
+  return rest.length ? func(val, ...rest) : (...others) => func(val, ...others)
+}
+
 function *genIter(obj) {
   for (const key of keys(obj)) {
     yield obj[key]
@@ -40,32 +44,31 @@ function *genIter(obj) {
   return obj
 }
 
-const each = (fn, iter) => {
+const each = curry((fn, iter) => {
   if (!isIterable(iter)) iter = genIter(iter)
 
   for(const item of iter) {
     fn(item)
   }
   return iter
-}
+})
 
-const map = (mapper, iter) => {
+const map = curry((mapper, iter) => {
   const result = []
   each(item=>result.push(mapper(item)), iter)
   return result
-}
+})
 
-const filter = (predi, iter) => {
+const filter = curry((predi, iter) => {
   const result = []
   each(item=>{if (predi(item)) result.push(item)}, iter)
   return result
-}
+})
 
-const reduce = (fn, acc, iter) => {
+const reduce = curry((fn, acc, iter) => {
   if (!iter) {
     iter = acc[Symbol.iterator]()
     acc = iter.next().value
-    console.log({acc})
   }
 
   each(item=>{
@@ -73,12 +76,18 @@ const reduce = (fn, acc, iter) => {
   }, iter)
 
   return acc
-}
+})
+
+const go = (...args) => reduce((prev, func)=>func(prev), args)
+
+const pipe = (fn, ...fns) => (...values) => go(fn(...values), ...fns)
 
 export {
   identity,
   isObject,
   isIterable,
+
+  curry,
 
   keys,
   each,
@@ -86,4 +95,6 @@ export {
   filter,
 
   reduce,
+  go,
+  pipe
 }
