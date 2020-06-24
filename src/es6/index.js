@@ -44,6 +44,22 @@ function *genIter(obj) {
   return obj
 }
 
+const range = length => {
+  let i=-1
+  const result = []
+  while(++i < length) {
+    result.push(i)
+  }
+  return result
+}
+
+const rangeL = function*(length) {
+  let i=-1
+  while(++i < length) {
+    yield i
+  }
+}
+
 const each = curry((fn, iter) => {
   if (!isIterable(iter)) iter = genIter(iter)
 
@@ -89,6 +105,8 @@ export {
 
   curry,
 
+  range,
+  rangeL,
   keys,
   each,
   map,
