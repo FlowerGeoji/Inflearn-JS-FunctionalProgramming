@@ -84,7 +84,7 @@ describe('Lazy Test', ()=>{
     expect(rangeLMock).toBeCalledTimes(5)
   })
 
-  test('Preformance test of range&rangeL', ()=>{
+  test('Preformance test', ()=>{
     const add = (a, b) => a+b
 
     const testPerf = (time, func) => {
@@ -96,10 +96,90 @@ describe('Lazy Test', ()=>{
 
       return end-start
     }
+
+    // 모든 값의 array를 생성 함
+    const rangeFunc = () => fp.go(fp.range(10000),
+      fp.take(5),
+      fp.reduce(add)
+    )
+
+    expect(
+      rangeFunc()
+    ).toBe(10)
+
+    // 0~4까지만 iterator를 돌고 끝남
+    const rangeLFunc = () => fp.go(fp.rangeL(10000),
+      fp.take(5),
+      fp.reduce(add)
+    )
+
+    expect(
+      rangeLFunc()
+    ).toBe(10)
+
+    expect(
+      fp.go(
+        fp.rangeL(Infinity),
+        fp.take(5),
+        fp.reduce(add)
+      )
+    ).toBe(10)
+
+    const rangeFuncTime = testPerf(1, rangeFunc)
+    const rangeLFuncTime = testPerf(1, rangeLFunc)
     
-    const rangeTime = testPerf(20, ()=>fp.reduce(add, fp.range(1000000)))
-    const rangeLTime = testPerf(20, ()=>fp.reduce(add, fp.rangeL(1000000)))
-    
-    expect(rangeLTime-rangeTime).toBeGreaterThan(0)
+    expect(rangeFuncTime-rangeLFuncTime).toBeGreaterThanOrEqual(0)
+  })
+
+  test('Lazy map, filter, take, reduce', ()=>{
+    const map = fp.mapL(a=>a+10, [1, 2, 3])
+    expect(map.next()).toMatchObject({value: 11, done: false})
+    expect(map.next()).toMatchObject({value: 12, done: false})
+    expect(map.next()).toMatchObject({value: 13, done: false})
+    expect(map.next()).toMatchObject({value: undefined, done: true})
+
+    const filter = fp.filterL(a=>a%2, [1, 2, 3, 4])
+    expect(filter.next()).toMatchObject({value: 1, done: false})
+    expect(filter.next()).toMatchObject({value: 3, done: false})
+    expect(filter.next()).toMatchObject({value: undefined, done: true})
+
+    const mapper = jest.fn(n=>n+10)
+    const predi = jest.fn(n=>n%10)
+
+    // range -> map -> filter -> take 순으로 실행
+    // range(10번) + map(10번) + filter(10번) + take(2번)
+    // 비효율
+    fp.go(fp.range(100),
+      fp.map(mapper),
+      fp.filter(predi),
+      fp.take(2)
+    )
+
+    expect(mapper).toBeCalledTimes(100)
+    expect(predi).toBeCalledTimes(100)
+
+    // take -> filterL -> mapL -> rangeL 순으로 실행
+    // take(2번) + filterL(3번) + mapL(3번) + rangeL(3번)
+    // 효율성이 좋음
+    fp.go(fp.rangeL(100),
+      fp.mapL(mapper),
+      fp.filterL(predi),
+      fp.take(2)
+    )
+
+    expect(mapper).toBeCalledTimes(100+3)
+    expect(predi).toBeCalledTimes(100+3)
+
+    /**
+     * ### map, filter 계열 함수들이 가지는 결합 법칙
+     * 
+     * - 사용하는 데이터가 무엇이든지
+     * - 사용하는 보조 함수가 순수 함수라면 무엇이든지
+     * - 아래와 같이 결합한다면 둘다 결과가 같다.
+     * 
+     * 수평평가 : [[mapping, mapping], [filtering, filtering], [mapping, mapping]]
+     * =
+     * 수직평가 : [[mapping, filtering, mapping], [mapping, filtering, mapping]]
+     */
   })
 })

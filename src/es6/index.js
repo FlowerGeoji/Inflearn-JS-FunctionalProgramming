@@ -53,7 +53,7 @@ const range = length => {
   return result
 }
 
-const rangeL = function*(length) {
+const rangeL = function *(length) {
   let i=-1
   while(++i < length) {
     yield i
@@ -63,9 +63,12 @@ const rangeL = function*(length) {
 const each = curry((fn, iter) => {
   if (!isIterable(iter)) iter = genIter(iter)
 
-  for(const item of iter) {
-    fn(item)
+  iter = iter[Symbol.iterator]()
+  let curr
+  while(!(curr=iter.next()).done) {
+    fn(curr.value)
   }
+
   return iter
 })
 
@@ -75,10 +78,26 @@ const map = curry((mapper, iter) => {
   return result
 })
 
+const mapL = curry(function*(mapper, iter) {
+  iter = iter[Symbol.iterator]()
+  let curr
+  while(!(curr=iter.next()).done) {
+    yield mapper(curr.value)
+  }
+})
+
 const filter = curry((predi, iter) => {
   const result = []
   each(item=>{if (predi(item)) result.push(item)}, iter)
   return result
+})
+
+const filterL = curry(function*(predi, iter) {
+  iter = iter[Symbol.iterator]()
+  let curr
+  while(!(curr=iter.next()).done) {
+    if (predi(curr.value)) yield curr.value
+  }
 })
 
 const reduce = curry((fn, acc, iter) => {
@@ -98,6 +117,17 @@ const go = (...args) => reduce((prev, func)=>func(prev), args)
 
 const pipe = (fn, ...fns) => (...values) => go(fn(...values), ...fns)
 
+const take = curry((length, iter) =>{
+  const result = []
+  for(const item of iter) {
+    result.push(item)
+    if(result.length===length){
+      return result
+    }
+  }
+  return result
+})
+
 export {
   identity,
   isObject,
@@ -105,14 +135,18 @@ export {
 
   curry,
 
-  range,
-  rangeL,
   keys,
   each,
   map,
+  mapL,
   filter,
+  filterL,
 
   reduce,
   go,
-  pipe
+  pipe,
+
+  range,
+  rangeL,
+  take,
 }
