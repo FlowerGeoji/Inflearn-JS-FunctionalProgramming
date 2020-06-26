@@ -16,20 +16,20 @@ import 'babel-polyfill'
  * ###
  */
 
-export const apply1 = func => func(1)
+// export const apply1 = func => func(1)
 
-export const times = (func, n) => {
-  let i = 0
-  while (i < n) func(i++)
-}
+// export const times = (func, n) => {
+//   let i = 0
+//   while (i < n) func(i++)
+// }
 
-export const addMaker = a => b => a+b
+// export const addMaker = a => b => a+b
 
 const identity = val => val
 
 const isObject = obj => typeof obj === 'object'
 
-const isIterable = iter => !!iter[Symbol.iterator]
+const isIterable = iter => iter && iter[Symbol.iterator]
 
 const keys = obj => isObject(obj) ? Object.keys(obj) : []
 
@@ -60,45 +60,68 @@ const rangeL = function *(length) {
   }
 }
 
+const entries = obj => {
+  const result = []
+  for (const key in obj) result.push([key, obj[key]])
+  return result
+}
+
+const entriesL = function *(obj){
+  for (const key in obj) yield [key, obj[key]]
+}
+
+const take = curry((length, iter) =>{
+  const result = []
+  for(const item of iter) {
+    result.push(item)
+    if(result.length===length){
+      return result
+    }
+  }
+  return result
+})
+
+const takeAll = take(Infinity)
+
+const go = (...args) => reduce((prev, func)=>func(prev), args)
+
+const pipe = (fn, ...fns) => (...values) => go(fn(...values), ...fns)
+
 const each = curry((fn, iter) => {
   if (!isIterable(iter)) iter = genIter(iter)
-
-  iter = iter[Symbol.iterator]()
-  let curr
-  while(!(curr=iter.next()).done) {
-    fn(curr.value)
-  }
-
+  for(const item of iter) fn(item)
   return iter
 })
 
-const map = curry((mapper, iter) => {
-  const result = []
-  each(item=>result.push(mapper(item)), iter)
-  return result
-})
-
 const mapL = curry(function*(mapper, iter) {
-  iter = iter[Symbol.iterator]()
-  let curr
-  while(!(curr=iter.next()).done) {
-    yield mapper(curr.value)
+  if (!isIterable(iter)) iter = genIter(iter)
+  for(const item of iter) {
+    yield mapper(item)
   }
 })
 
-const filter = curry((predi, iter) => {
-  const result = []
-  each(item=>{if (predi(item)) result.push(item)}, iter)
-  return result
-})
+const map = curry(pipe(
+  mapL,
+  takeAll
+))
 
 const filterL = curry(function*(predi, iter) {
-  iter = iter[Symbol.iterator]()
-  let curr
-  while(!(curr=iter.next()).done) {
-    if (predi(curr.value)) yield curr.value
+  if (!isIterable(iter)) iter = genIter(iter)
+  for (const item of iter) {
+    if (predi(item)) yield item
   }
 })
+
+const filter = curry(pipe(
+  filterL,
+  takeAll
+))
+
+const find = curry((predi, iter) => go(iter,
+  filterL(predi),
+  take(1),
+  ([a])=>a
+))
 
 const reduce = curry((fn, acc, iter) => {
   if (!iter) {
@@ -113,20 +136,49 @@ const reduce = curry((fn, acc, iter) => {
   return acc
 })
 
-const go = (...args) => reduce((prev, func)=>func(prev), args)
+const join = curry((sep=',', iter) => reduce((prev, curr)=>`${prev}${sep}${curr}`, iter))
 
-const pipe = (fn, ...fns) => (...values) => go(fn(...values), ...fns)
-
-const take = curry((length, iter) =>{
-  const result = []
+const flattenL = function *(iter) {
   for(const item of iter) {
-    result.push(item)
-    if(result.length===length){
-      return result
+    if (isIterable(item)){
+      yield* item
+    }
+    else {
+      yield item
     }
   }
-  return result
-})
+}
+
+const flatten = pipe(
+  flattenL,
+  takeAll
+)
+
+const deepFlattenL = function* (iter) {
+  for(const item of iter) {
+    if (isIterable(item)){
+      yield* deepFlattenL(item)
+    }
+    else {
+      yield item
+    }
+  }
+}
+
+const deepFlatten = pipe(
+  deepFlattenL,
+  takeAll
+)
+
+const flatMapL = curry(pipe(
+  mapL,
+  flattenL
+))
+
+const flatMap = curry(pipe(
+  mapL,
+  flatten
+))
 
 export {
   identity,
@@ -145,8 +197,20 @@ export {
   reduce,
   go,
   pipe,
+  join,
 
   range,
   rangeL,
+  entries,
+  entriesL,
+
   take,
+  find,
+
+  flattenL,
+  flatten,
+  deepFlattenL,
+  deepFlatten,
+  flatMapL,
+  flatMap
 }
