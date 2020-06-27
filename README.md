@@ -4,7 +4,13 @@
   - [자바스크립트로 알아보는 함수형 프로그래밍 (ES5)][1]
   - [함수형 프로그래밍과 JavaScript ES6+][2]
 
-- 강의에서 보여주는 샘프로 코드들은 test case로 구현
+- 강의에서 보여주는 샘플 코드들은 test case로 구현
+
+## TODO
+
+- es5,es6 코드 정리하기
+- test-case viewer 적용
+- typescript도 추가하기
 
 [1]: https://www.inflearn.com/course/%ED%95%A8%EC%88%98%ED%98%95-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D
 
