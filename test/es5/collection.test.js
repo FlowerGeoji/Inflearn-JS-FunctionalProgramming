@@ -1,4 +1,4 @@
-import * as fp from '../src/es5/index'
+import * as fp from '../../src/es5/index'
 
 describe('Collection test', ()=>{
   // 1. 수집하기 - map, values, pluck 등
