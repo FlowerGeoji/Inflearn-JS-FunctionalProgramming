@@ -1,87 +1,11 @@
-# fp
+# Javascript ES5, ES6 함수형 프로그래밍 공부
 
-## 함수형 프로그래밍 요약
+- 수업자료는 인프런에서 유인동님 강의
+  - [자바스크립트로 알아보는 함수형 프로그래밍 (ES5)][1]
+  - [함수형 프로그래밍과 JavaScript ES6+][2]
 
-1. 함수를 되도록 **작게** 만들기
-2. **다형성** 높은 함수 만들기
-3. **상태**를 변경하지 않거나, **정확히** 다루어 **부수 효과를 최소화** 하기
-4. 동일한 인자를 받으면 항상 동일한 결과를 리턴하는 **순수 함수** 만들기
-5. 복잡한 객체 하나를 인자로 사용하기보다 되도록 **일반적인 값** 여러 개를 **인자**로 사용하기
-6. 큰 **로직**을 **고차 함수**로 만들고 세부 로직을 **보조 함수**로 완성하기
-7. 어느곳에서든 **바로 혹은 미뤄서 실행**할 수 있도록 일반 함수이자 순수 함수로 선언하기
-8. 모델이나 컬렉션 등의 커스텀 객체보다는 **기본 객체**를 이용하기
-9. 로직의 흐름을 최대한 **단방향으로 흐르게**하기
-10. 작음 함수를 **조합**하여 큰 함수 만들기
+- 강의에서 보여주는 샘프로 코드들은 test case로 구현
 
-## BASIC
+[1]: https://www.inflearn.com/course/%ED%95%A8%EC%88%98%ED%98%95-%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D
 
-### 이터러블/이터레이터 프로토콜
-
-- 이터러블 : 이터레이터를 리턴하는 `[Symbol.iterator]()` 를 가진 값
-- 이터레이터 : {value, done} 객체를 리턴하는 next() 를 가진 값
-- 이터러블/이터레이터 프로토콜 : 이터러블을 for...of, 전개 연산자 등과 함께 동작하도록한 규약
-
-### 제너레이터/이터레이터
-
-- 제너레이터 : 이터레이터이자 이터러블을 생성하는 함수
-
-### 평가
-
-- 코드가 계산(evaluation) 되어 값을 만드는 것
-
-### 일급
-
-- 값으로 다룰 수 있다.
-- 변수에 담을 수 있다.
-- 함수의 인자로 사용될 수 있다.
-- 함수의 결과로 사용될 수 있다.
-
-### 고차함수
-
-- 함수를 값으로 다루는 함수
-- 함수를 만들어 리턴하는 함수 (클로저를 만들어 리턴하는 함수)
-
-## 함수형 프로그래밍의 중요성
-
-### Functional paradigm
-
-- Clojure
-
-```clojure
-(defn -main []
-  (prinln
-    (map (fn [user] (:name user))
-      (filter (fn [user] (< (:age user) 30)) users)))
-```
-
-- Elixir
-
-```elixir
-Console.log(
-  Enum.map(
-    Enum.filter(users, fn user -> user.age > 30 end),
-    fn user -> user.name end
-  )
-)
-
-users
-  |> Enum.filter(&(&1.age > 30)),
-  |> Enum.map(&(&1.name))
-  |> Console.log
-```
-
-- Javascript
-
-```javscript
-console.log(
-  _map(user => user.age)
-    (_filter(user => user.age < 30)(users))
-)
-```
-
-### 지연평가 & 병렬성 & 동시성
-
-### 비동기 I/O NodeJS
-
-----
-  
+[2]: https://www.inflearn.com/course/functional-es6#
