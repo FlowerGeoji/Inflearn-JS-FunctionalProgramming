@@ -25,6 +25,9 @@
     "jest": "^26.0.1"
   },
   "dependencies": {
-    "lodash": "^4.17.15"
+    "fxjs": "^0.16.2",
+    "lodash": "^4.17.15",
+    "rambda": "^5.8.0",
+    "underscore": "^1.10.2"
   }
 }
