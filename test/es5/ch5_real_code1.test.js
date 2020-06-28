@@ -1,7 +1,6 @@
-import * as fp from '../../src/es5/index'
 import * as _ from 'lodash/fp'
 
-describe('ch7 real code 1', ()=>{
+describe('ch5 real code 1', ()=>{
   const USERS = [
     {id: 101, name: 'ID'},
     {id: 102, name: 'BJ'},
